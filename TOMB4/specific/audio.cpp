@@ -158,7 +158,7 @@ static long audio_buffer_size = 0;
 static long CurrentNotify = 0;
 static long NotifySize = 0;
 static long NextWriteOffset = 0;
-static long auido_play_mode = 0;
+static long audio_play_mode = 0;
 static long audio_counter = 0;
 static volatile bool reading_audio_file = 0;
 static volatile bool continue_reading_audio_file = 0;
@@ -186,7 +186,7 @@ void OpenStreamFile(char* name)
 	audio_fp_write_ptr = wav_file_buffer;
 	memset(wav_file_buffer, 0, 0x37000);
 
-	if (fread(wav_file_buffer, 1, 0x37000, audio_stream_fp) < 0x37000 && auido_play_mode == 1)
+	if (fread(wav_file_buffer, 1, 0x37000, audio_stream_fp) < 0x37000 && audio_play_mode == 1)
 	{
 		fseek(audio_stream_fp, 90, SEEK_SET);
 		Log(0, "FileReset In OpenStreamFile");
@@ -200,7 +200,7 @@ void GetADPCMData()
 
 	memset(audio_fp_write_ptr, 0, 0x5800);
 
-	if (fread(audio_fp_write_ptr, 1, 0x5800, audio_stream_fp) < 0x5800 && auido_play_mode == 1)
+	if (fread(audio_fp_write_ptr, 1, 0x5800, audio_stream_fp) < 0x5800 && audio_play_mode == 1)
 	{
 		Log(0, "FileReset In GetADPCMData");
 		fseek(audio_stream_fp, 90, SEEK_SET);
@@ -248,7 +248,7 @@ void ACMEmulateCDPlay(long track, long mode)
 	XATrack = track;
 	XAReqTrack = track;
 	XAFlag = 6;
-	auido_play_mode = mode;
+	audio_play_mode = mode;
 	OpenStreamFile(name);
 
 	if (!audio_stream_fp)
@@ -366,7 +366,7 @@ void FillADPCMBuffer(char* p, long track)
 
 	if (audio_stream_fp && feof(audio_stream_fp))
 	{
-		if (auido_play_mode == 1)
+		if (audio_play_mode == 1)
 			fseek(audio_stream_fp, 90, SEEK_SET);
 		else
 		{
@@ -376,7 +376,7 @@ void FillADPCMBuffer(char* p, long track)
 			{
 				audio_counter = 0;
 
-				if (auido_play_mode == 2)
+				if (audio_play_mode == 2)
 				{
 					reading_audio_file = 0;
 					continue_reading_audio_file = 0;

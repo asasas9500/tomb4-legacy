@@ -769,7 +769,7 @@ bool LoadObjects()
 	memcpy(meshes, FileData, size * sizeof(short*));
 	FileData += size * sizeof(short*);
 
-	for (int i=0;i<size;i++)
+	for (int i = 0; i < size; i++)
 		meshes[i] = mesh_base + (long)meshes[i] / 2;
 
 	num_meshes = size;
