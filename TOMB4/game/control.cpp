@@ -82,7 +82,7 @@ ulong CutSceneTriggered;
 long SetDebounce;
 long framecount = 0;
 long reset_flag = 0;
-long WeaponDelay = 0;
+uchar WeaponDelay = 0;
 long LaserSightX;
 long LaserSightY;
 long LaserSightZ;
@@ -182,14 +182,13 @@ long ControlPhase(long nframes, long demo_mode)
 		{
 			if (input & IN_SAVE)
 				S_LoadSave(IN_SAVE, 0);
-
 			else if (input & IN_LOAD)
 			{
 				if (S_LoadSave(IN_LOAD, 0) >= 0)
 					return 2;
 			}
 
-			if (input & IN_PAUSE && gfGameMode == 0)
+			if (input & IN_PAUSE && !gfGameMode)
 			{
 				if (S_PauseMenu() == 8)
 					return 1;
@@ -200,16 +199,19 @@ long ControlPhase(long nframes, long demo_mode)
 			return 4;
 
 		if (input & IN_LOOK && (lara_item->current_anim_state == AS_STOP && lara_item->anim_number == ANIM_BREATH ||
-			(lara.IsDucked && input & IN_DUCK && lara_item->anim_number == ANIM_DUCKBREATHE && lara_item->goal_anim_state == AS_DUCK)))
+			(lara.IsDucked && !(input & IN_DUCK) && lara_item->anim_number == ANIM_DUCKBREATHE && lara_item->goal_anim_state == AS_DUCK)))
 		{
 			if (!BinocularRange)
 			{
-				if (lara.gun_type == WEAPON_REVOLVER && lara.sixshooter_type_carried & 4 && lara.gun_status == LG_READY)
+				if (lara.gun_type == WEAPON_REVOLVER)
 				{
-					BinocularRange = 128;
-					BinocularOldCamera = camera.old_type;
-					lara.Busy = 1;
-					LaserSight = 1;
+					if (lara.sixshooter_type_carried & 4 && lara.gun_status == LG_READY)
+					{
+						BinocularRange = 128;
+						BinocularOldCamera = camera.old_type;
+						lara.Busy = 1;
+						LaserSight = 1;
+					}
 				}
 				else if (lara.gun_type == WEAPON_CROSSBOW && lara.crossbow_type_carried & 4 && lara.gun_status == LG_READY)
 				{
@@ -230,10 +232,10 @@ long ControlPhase(long nframes, long demo_mode)
 				lara_item->mesh_bits = -1;
 				lara.Busy = 0;
 				camera.type = BinocularOldCamera;
-				lara.move_angle = 0;
 				lara.head_y_rot = 0;
-				lara.head_z_rot = 0;
+				lara.head_x_rot = 0;
 				lara.torso_y_rot = 0;
+				lara.torso_x_rot = 0;
 				BinocularOn = -8;
 			}
 			else
@@ -352,22 +354,25 @@ long ControlPhase(long nframes, long demo_mode)
 			GLOBAL_inventoryitemchosen = -1;
 		}
 
-		if (GLOBAL_playing_cutseq)
-		{
-			camera.type = CINEMATIC_CAMERA;
-			CalculateCamera();
-		}
-		else
+		if (!GLOBAL_playing_cutseq)
 		{
 			HairControl(0, 0, 0);
 
 			if (gfLevelFlags & GF_YOUNGLARA)
 				HairControl(0, 1, 0);
+		}
 
+		if (!GLOBAL_playing_cutseq)
+		{
 			if (bUseSpotCam)
 				CalculateSpotCams();
 			else if (!bVoncroyCutScene)
 				CalculateCamera();
+		}
+		else
+		{
+			camera.type = CINEMATIC_CAMERA;
+			CalculateCamera();
 		}
 
 		CamRot.y = (mGetAngle(camera.pos.z, camera.pos.x, camera.target.z, camera.target.x) >> 4) & 0xFFF;

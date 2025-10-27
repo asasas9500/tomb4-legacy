@@ -77,7 +77,7 @@ extern ulong CutSceneTriggered;
 extern long SetDebounce;
 extern long framecount;
 extern long reset_flag;
-extern long WeaponDelay;
+extern uchar WeaponDelay;
 extern long LaserSightX;
 extern long LaserSightY;
 extern long LaserSightZ;
