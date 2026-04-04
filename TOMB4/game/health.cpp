@@ -88,7 +88,7 @@ void DrawHealthBar(long flash_state)
 		else
 			S_DrawHealthBar(0);
 	}
-	else if (health_bar_timer > 0 || lara.gun_status == LG_READY && lara.gun_type != 8 || lara.poisoned >= 256)
+	else if (health_bar_timer > 0 || hitpoints <= 0 || lara.gun_status == LG_READY && lara.gun_type != 8 || lara.poisoned >= 256)
 		S_DrawHealthBar(hitpoints / 10);
 
 	if (PoisonFlag)
