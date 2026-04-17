@@ -50,6 +50,7 @@ void InitialiseBike(short item_number)
 	bike->right_front_wheelrot = 0;
 	bike->right_back_wheelrot = 0;
 	bike->left_wheelrot = 0;
+	bike->right_wheelrot = 0;
 	item->mesh_bits = 1015;
 	GlobalBikeItem = item;
 }
