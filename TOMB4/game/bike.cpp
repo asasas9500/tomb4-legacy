@@ -27,7 +27,7 @@
 #include "savegame.h"
 
 static ITEM_INFO* GlobalBikeItem;
-static long bikefspeed = 0;
+static short bikefspeed = 0;
 static short broomies[22];
 static char dont_exit_bike = 0;
 
