@@ -71,7 +71,7 @@ char scratchpad[1024];
 static PHD_VECTOR NodeVectors[16];
 
 
-LIGHTNING_STRUCT* TriggerLightning(PHD_VECTOR* s, PHD_VECTOR* d, char variation, long rgb, uchar flags, uchar size, uchar segments)
+void TriggerLightning(PHD_VECTOR* s, PHD_VECTOR* d, char variation, long rgb, uchar flags, uchar size, uchar segments)
 {
 	LIGHTNING_STRUCT* lptr;
 	char* vptr;
@@ -112,11 +112,9 @@ LIGHTNING_STRUCT* TriggerLightning(PHD_VECTOR* s, PHD_VECTOR* d, char variation,
 			lptr->Segments = segments;
 			lptr->Rand = variation;
 			lptr->Size = size;
-			return lptr;
+			return;
 		}
 	}
-
-	return 0;
 }
 
 long ExplodingDeath2(short item_number, long mesh_bits, short Flags)

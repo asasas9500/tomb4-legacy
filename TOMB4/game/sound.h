@@ -7,6 +7,7 @@ void SOUND_Init();
 void SOUND_Stop();
 long SoundEffect(long sfx, PHD_3DPOS* pos, long flags);
 void SayNo();
+void SOUND_EndScene();
 
 extern SAMPLE_INFO* sample_infos;
 extern SoundSlot LaSlot[32];

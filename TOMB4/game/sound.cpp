@@ -371,3 +371,44 @@ void SayNo()
 
 	SoundEffect(fx, 0, SFX_ALWAYS);
 }
+
+void SOUND_EndScene()
+{
+	SoundSlot* slot;
+
+	if (!sound_active)
+		return;
+
+	for (int i = 0; i < 32; i++)
+	{
+		slot = &LaSlot[i];
+
+		if (slot->nSampleInfo < 0)
+			continue;
+
+		if ((sample_infos[slot->nSampleInfo].flags & 3) != 3)
+		{
+			if (!S_SoundSampleIsPlaying(i))
+				slot->nSampleInfo = -1;
+			else
+			{
+				GetPanVolume(slot);
+				S_SoundSetPanAndVolume(i, (short)slot->nPan, (ushort)slot->nVolume);
+			}
+		}
+		else
+		{
+			if (!slot->nVolume)
+			{
+				S_SoundStopSample(i);
+				slot->nSampleInfo = -1;
+			}
+			else
+			{
+				S_SoundSetPanAndVolume(i, (short)slot->nPan, (ushort)slot->nVolume);
+				S_SoundSetPitch(i, slot->nPitch);
+				slot->nVolume = 0;
+			}
+		}
+	}
+}
