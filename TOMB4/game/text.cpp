@@ -274,33 +274,32 @@ void UpdatePulseColour()
 {
 	D3DTLVERTEX v;
 	static uchar PulseCnt = 0;
-	uchar c, r, g, b;
+	uchar c, r, g, b, sr, sg, sb;
 
 	PulseCnt = (PulseCnt + 1) & 0x1F;
 
-	if (PulseCnt > 16)
+	if (PulseCnt >= 16)
 		c = -PulseCnt;
 	else
 		c = PulseCnt;
 
 	c <<= 3;
 	CalcColorSplit(RGBONLY(c, c, c), &v.color);
+	r = CLRR(v.color);
+	g = CLRG(v.color);
+	b = CLRB(v.color);
+	sr = CLRR(v.specular);
+	sg = CLRG(v.specular);
+	sb = CLRB(v.specular);
 
 	for (int i = 0; i < 16; i++)
 	{
-		r = CLRR(v.color);
-		g = CLRG(v.color);
-		b = CLRB(v.color);
 		FontShades[1][i << 1].r = r;
 		FontShades[1][i << 1].g = g;
 		FontShades[1][i << 1].b = b;
-
-		r = CLRR(v.specular);
-		g = CLRG(v.specular);
-		b = CLRB(v.specular);
-		FontShades[1][(i << 1) + 1].r = r;
-		FontShades[1][(i << 1) + 1].g = g;
-		FontShades[1][(i << 1) + 1].b = b;
+		FontShades[1][(i << 1) + 1].r = sr;
+		FontShades[1][(i << 1) + 1].g = sg;
+		FontShades[1][(i << 1) + 1].b = sb;
 	}
 }
 
