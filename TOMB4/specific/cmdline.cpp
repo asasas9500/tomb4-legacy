@@ -25,6 +25,7 @@ static bool Filter = 1;
 static bool VolumetricFx = 0;
 static bool BumpMap = 0;
 static bool TextLow = 0;
+static long DSDeviceSelected;
 
 void CLSetup(char* cmd)
 {
@@ -52,6 +53,8 @@ void InitDSDevice(HWND dlg, HWND hwnd)
 
 	for (int i = 0; i < App.DXInfo.nDSInfo; i++)
 		SendMessage(hwnd, CB_ADDSTRING, 0, (LPARAM)App.DXInfo.DSInfo[i].About);
+
+	DSDeviceSelected = 0;
 
 	if (!App.DXInfo.nDSInfo)
 	{
