@@ -78,7 +78,7 @@ void S_LoadBar()
 		App.dx.lpD3DDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_SRCALPHA);
 		App.dx.lpD3DDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVSRCALPHA);
 		App.dx.lpD3DDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, 0);
-		loadbar_pos += 100 / loadbar_maxpos;
+		loadbar_pos += 100.0F / loadbar_maxpos;
 		DoBar(20, phd_winymax - font_height, 600, 15, (long)loadbar_pos, 0xFF000000, 0xFF9F1F80);
 		SortPolyList(SortCount, SortList);
 		RestoreFPCW(FPCW);
