@@ -285,7 +285,6 @@ void CalculateSpotCams()
 	}
 
 	FirstCam = &SpotCam[first_camera];
-	sp = 0;
 
 	if (FirstCam->flags & 8)
 		spline_cnt = current_camera_cnt + 2;
@@ -311,6 +310,7 @@ void CalculateSpotCams()
 
 	if (FirstCam->flags & 8)
 	{
+		sp = 0;
 		cp = 0;
 		cs = 0x2000;
 		lx = lara_item->pos.x_pos;
@@ -341,7 +341,7 @@ void CalculateSpotCams()
 			}
 
 			cs >>= 1;
-			sp = cp - (cs << 1);
+			sp = cp - ((cs & -2) << 1);
 
 			if (sp < 0)
 				sp = 0;
@@ -355,9 +355,9 @@ void CalculateSpotCams()
 				current_spline_position = cp;
 		}
 
-		if (cp < 0)
+		if (current_spline_position < 0)
 			current_spline_position = 0;
-		else if (cp > 0x10000)
+		else if (current_spline_position > 0x10000)
 			current_spline_position = 0x10000;
 	}
 	else if (!spotcam_timer)
@@ -429,6 +429,8 @@ void CalculateSpotCams()
 			bTrackCamInit = 1;
 		else if (current_spline_position > 0x10000 - cspeed)
 		{
+			next_spline_camera = current_spline_camera;
+
 			if (CurrentCam->flags & 0x4000)
 				bCheckTrigger = 1;
 
@@ -447,7 +449,7 @@ void CalculateSpotCams()
 				if (current_spline_camera == first_camera)
 					next_spline_camera = last_camera;
 				else
-					next_spline_camera = current_spline_camera - 1;
+					next_spline_camera--;
 
 				cunt = 1;
 
@@ -579,6 +581,7 @@ void CalculateSpotCams()
 						camera_ytarget[3] = camera.target.y;
 						camera_ztarget[3] = camera.target.z;
 						camera_fov[3] = CurrentFov;
+						camera_roll[3] = 0;
 						camera_speed[3] = camera_speed[1] >> 1;
 						memcpy(&camera, &backup, sizeof(CAMERA_INFO));
 						phd_LookAt(backup.pos.x, backup.pos.y, backup.pos.z, backup.target.x, backup.target.y, backup.target.z, (short)croll);
