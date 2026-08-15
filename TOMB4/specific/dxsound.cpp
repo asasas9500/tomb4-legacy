@@ -85,7 +85,7 @@ void DSAdjustPan(long num, long pan)
 		if (pan < 0)
 		{
 			if (pan < -0x4000)
-				pan = -0x4000 - pan;
+				pan = -0x8000 - pan;
 		}
 		else if (pan > 0 && pan > 0x4000)
 			pan = 0x8000 - pan;
@@ -117,7 +117,6 @@ bool DXSetOutputFormat()
 
 bool DXDSCreate()
 {
-	sizeof(WAVEFORMATEX);
 	Log(2, "DXDSCreate");
 	DXAttempt(DirectSoundCreate(G_dxinfo->DSInfo[G_dxinfo->nDS].lpGuid, &App.dx.lpDS, 0));
 	DXAttempt(App.dx.lpDS->SetCooperativeLevel(App.hWnd, DSSCL_EXCLUSIVE));
@@ -300,8 +299,7 @@ long CalcVolume(long volume)
 
 	if (result > 0)
 		result = 0;
-
-	if (result < -10000)
+	else if (result < -10000)
 		result = -10000;
 
 	return result;
@@ -344,10 +342,10 @@ void DXFreeSounds()
 
 long S_SoundSampleIsPlaying(long num)
 {
-	if (sound_active && DSIsChannelPlaying(num))
-		return 1;
+	if (!sound_active)
+		return 0;
 
-	return 0;
+	return DSIsChannelPlaying(num);
 }
 
 void S_SoundSetPanAndVolume(long num, short pan, ushort volume)
