@@ -95,7 +95,7 @@ unsigned int __stdcall LoadLevel(void* name)
 		fread(&compressedSize, 1, 4, level_fp);
 		CompressedData = (char*)malloc(compressedSize);
 		FileData = (char*)malloc(size);
-		fread(CompressedData, compressedSize, 1u, level_fp);
+		fread(CompressedData, compressedSize, 1, level_fp);
 		Decompress(FileData, CompressedData, compressedSize, size);
 		free(CompressedData);
 
@@ -352,6 +352,7 @@ bool LoadTextures(long RTPages, long OTPages, long BTPages)
 	LPDIRECT3DTEXTUREX pTex;
 	uchar* TextureData;
 	long* d;
+	static char* FileDataBackup;
 	char* pData;
 	char* pComp;
 	char* s;
@@ -359,21 +360,15 @@ bool LoadTextures(long RTPages, long OTPages, long BTPages)
 	uchar r, g, b, a;
 
 	Log(2, "LoadTextures");
+	FileDataBackup = FileData;
 	nTextures = 1;
 	format = 0;
 	skip = 4;
 	dxtex = &G_dxinfo->DDInfo[G_dxinfo->nDD].D3DDevices[G_dxinfo->nD3D].TextureInfos[G_dxinfo->nTexture];
 
 	if (dxtex->rbpp == 8 && dxtex->gbpp == 8 && dxtex->bbpp == 8 && dxtex->abpp == 8)
+	{
 		format = 1;
-	else if (dxtex->rbpp == 5 && dxtex->gbpp == 5 && dxtex->bbpp == 5 && dxtex->abpp == 1)
-	{
-		format = 2;
-		skip = 2;
-	}
-
-	if (format <= 1)
-	{
 		fread(&size, 1, 4, level_fp);
 		fread(&compressedSize, 1, 4, level_fp);
 
@@ -388,8 +383,10 @@ bool LoadTextures(long RTPages, long OTPages, long BTPages)
 		fseek(level_fp, compressedSize, SEEK_CUR);
 		free(CompressedData);
 	}
-	else
+	else if (dxtex->rbpp == 5 && dxtex->gbpp == 5 && dxtex->bbpp == 5 && dxtex->abpp == 1)
 	{
+		format = 2;
+		skip = 2;
 		fread(&size, 1, 4, level_fp);
 		fread(&compressedSize, 1, 4, level_fp);
 		fseek(level_fp, compressedSize, SEEK_CUR);
@@ -401,6 +398,22 @@ bool LoadTextures(long RTPages, long OTPages, long BTPages)
 		FileData = (char*)malloc(size);
 		fread(CompressedData, compressedSize, 1, level_fp);
 		Decompress(FileData, CompressedData, compressedSize, size);
+		free(CompressedData);
+	}
+	else
+	{
+		fread(&size, 1, 4, level_fp);
+		fread(&compressedSize, 1, 4, level_fp);
+
+		CompressedData = (char*)malloc(compressedSize);
+		FileData = (char*)malloc(size);
+
+		fread(CompressedData, compressedSize, 1, level_fp);
+		Decompress(FileData, CompressedData, compressedSize, size);
+
+		fread(&size, 1, 4, level_fp);
+		fread(&compressedSize, 1, 4, level_fp);
+		fseek(level_fp, compressedSize, SEEK_CUR);
 		free(CompressedData);
 	}
 
@@ -1213,7 +1226,7 @@ bool LoadAIInfo()
 
 bool LoadSamples()
 {
-	long num_samples, uncomp_size, comp_size;
+	long nSamples, num_samples, uncomp_size, comp_size;
 	static long num_sample_infos;
 
 	Log(2, "LoadSamples");
@@ -1243,16 +1256,10 @@ bool LoadSamples()
 	}
 
 	Log(8, "Number Of Samples %d", num_samples);
-	fread(&num_samples, 1, 4, level_fp);
+	fread(&nSamples, 1, 4, level_fp);
 	InitSampleDecompress();
 
-	if (num_samples <= 0)
-	{
-		FreeSampleDecompress();
-		return 1;
-	}
-
-	for (int i = 0; i < num_samples; i++)
+	for (int i = 0; i < nSamples; i++)
 	{
 		fread(&uncomp_size, 1, 4, level_fp);
 		fread(&comp_size, 1, 4, level_fp);
