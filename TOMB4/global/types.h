@@ -2183,7 +2183,7 @@ struct WEAPON_INFO
 	short shot_accuracy;
 	short gun_height;
 	short target_dist;
-	char damage;
+	uchar damage;
 	char recoil_frame;
 	char flash_time;
 	char draw_frame;

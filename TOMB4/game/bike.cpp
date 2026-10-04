@@ -828,18 +828,21 @@ void BikeCollideStaticObjects(long x, long y, long z, short room_number, long he
 	broomies[0] = room_number;
 	doors = room[room_number].door;
 
-	for (int i = *doors++; i > 0; i--, doors += 16)
+	if (doors)
 	{
-		for (j = 0; j < room_count; j++)
+		for (int i = *doors++; i > 0; i--, doors += 16)
 		{
-			if (broomies[j] == *doors)
-				break;
-		}
+			for (j = 0; j < room_count; j++)
+			{
+				if (broomies[j] == *doors)
+					break;
+			}
 
-		if (j == room_count)
-		{
-			broomies[room_count] = *doors;
-			room_count++;
+			if (j == room_count)
+			{
+				broomies[room_count] = *doors;
+				room_count++;
+			}
 		}
 	}
 

@@ -2482,7 +2482,7 @@ long GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, long DrawTarget, long f
 						SmashedMesh[SmashedMeshCount] = Mesh;
 						SmashedMeshCount++;
 						Mesh->Flags &= ~1;
-						SoundEffect(SFX_HIT_ROCK, (PHD_3DPOS*)Mesh, SFX_DEFAULT);
+						SoundEffect(SFX_HIT_ROCK, (PHD_3DPOS*)&target, SFX_DEFAULT);
 					}
 
 					TriggerRicochetSpark(&target, lara_item->pos.y_rot, 3, 0);

@@ -1166,18 +1166,21 @@ void JeepCollideStaticObjects(long x, long y, long z, short room_number, long he
 	jroomies[0] = room_number;
 	doors = room[room_number].door;
 
-	for (int i = *doors++; i > 0; i--, doors += 16)
+	if (doors)
 	{
-		for (j = 0; j < room_count; j++)
+		for (int i = *doors++; i > 0; i--, doors += 16)
 		{
-			if (jroomies[j] == *doors)
-				break;
-		}
+			for (j = 0; j < room_count; j++)
+			{
+				if (jroomies[j] == *doors)
+					break;
+			}
 
-		if (j == room_count)
-		{
-			jroomies[room_count] = *doors;
-			room_count++;
+			if (j == room_count)
+			{
+				jroomies[room_count] = *doors;
+				room_count++;
+			}
 		}
 	}
 
@@ -1189,12 +1192,11 @@ void JeepCollideStaticObjects(long x, long y, long z, short room_number, long he
 
 		for (j = r->num_meshes; j > 0; j--, mesh++)
 		{
-			sinfo = &static_objects[mesh->static_number];
-
 			if (mesh->Flags & 1)
 			{
 				if (mesh->static_number >= SHATTER0 && mesh->static_number <= SHATTER9)
 				{
+					sinfo = &static_objects[mesh->static_number];
 					CollidedStaticBounds[2] = mesh->y + sinfo->y_maxc;
 					CollidedStaticBounds[3] = mesh->y + sinfo->y_minc;
 

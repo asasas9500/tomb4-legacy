@@ -975,9 +975,7 @@ void ControlGrenade(short item_number)
 	ITEM_INFO* target;
 	MESH_INFO* mesh;
 	FLOOR_INFO* floor;
-	PHD_VECTOR oldPos;
-	PHD_VECTOR pos;
-	long abovewater, xv, yv, zv, exploded, rad, j;
+	long oldx, oldy, oldz, abovewater, x, y, z, xv, yv, zv, exploded, rad, j;
 	short new_num, yrot, room_number, NumTrigs;
 	short TriggerItems[8];
 
@@ -1054,9 +1052,10 @@ void ControlGrenade(short item_number)
 		return;
 	}
 
-	oldPos.x = item->pos.x_pos;
-	oldPos.y = item->pos.y_pos;
-	oldPos.z = item->pos.z_pos;
+	oldx = item->pos.x_pos;
+	oldy = item->pos.y_pos;
+	oldz = item->pos.z_pos;
+	item->shade = -0x3DF0;
 
 	if (room[item->room_number].flags & ROOM_UNDERWATER)
 	{
@@ -1098,12 +1097,12 @@ void ControlGrenade(short item_number)
 		phd_mxptr[M23] = 0;
 		phd_RotYXZ(item->pos.y_rot + 0x8000, item->pos.x_rot, item->pos.z_rot);
 		phd_TranslateRel(0, 0, -64);
-		pos.x = phd_mxptr[M03] >> W2V_SHIFT;
-		pos.y = phd_mxptr[M13] >> W2V_SHIFT;
-		pos.z = phd_mxptr[M23] >> W2V_SHIFT;
+		x = phd_mxptr[M03] >> W2V_SHIFT;
+		y = phd_mxptr[M13] >> W2V_SHIFT;
+		z = phd_mxptr[M23] >> W2V_SHIFT;
 		phd_PopMatrix();
 
-		TriggerRocketSmoke(item->pos.x_pos + pos.x, item->pos.y_pos + pos.y, item->pos.z_pos + pos.z, -1);
+		TriggerRocketSmoke(item->pos.x_pos + x, item->pos.y_pos + y, item->pos.z_pos + z, -1);
 	}
 
 	xv = (item->speed * phd_sin(item->goal_anim_state)) >> W2V_SHIFT;
@@ -1126,7 +1125,7 @@ void ControlGrenade(short item_number)
 	{
 		yrot = item->pos.y_rot;
 		item->pos.y_rot = item->goal_anim_state;
-		DoProperDetection(item_number, oldPos.x, oldPos.y, oldPos.z, xv, yv, zv);
+		DoProperDetection(item_number, oldx, oldy, oldz, xv, yv, zv);
 		item->goal_anim_state = item->pos.y_rot;
 		item->pos.y_rot = yrot;
 	}
@@ -1218,7 +1217,7 @@ void ControlGrenade(short item_number)
 					{
 						NumTrigs = (short)GetSwitchTrigger(target, TriggerItems, 1);
 
-						for (int i = 0; i < NumTrigs; i++)
+						for (int i = NumTrigs - 1; i >= 0; i--)
 						{
 							AddActiveItem(TriggerItems[i]);
 							items[TriggerItems[i]].status = ITEM_ACTIVE;
@@ -1227,7 +1226,7 @@ void ControlGrenade(short item_number)
 					}
 					else
 					{
-						room_number = item->room_number;
+						room_number = target->room_number;
 						GetHeight(GetFloor(target->pos.x_pos, target->pos.y_pos - 256, target->pos.z_pos, &room_number),
 							target->pos.x_pos, target->pos.y_pos - 256, target->pos.z_pos);
 						TestTriggers(trigger_index, 1, target->flags & IFL_CODEBITS);
@@ -1270,6 +1269,9 @@ void ControlGrenade(short item_number)
 				mesh = meshlist[j];
 			}
 		}
+
+		if (!exploded)
+			return;
 	}
 
 	if (item->item_flags[0] == 3)
@@ -1295,10 +1297,10 @@ void ControlGrenade(short item_number)
 		item->pos.y_pos -= 128;
 		TriggerShockwave((PHD_VECTOR*)&item->pos, 0x1300030, 96, 0x18806000, 0);
 		item->pos.y_pos += 128;
-		TriggerExplosionSparks(oldPos.x, oldPos.y, oldPos.z, 3, -2, 0, item->room_number);
+		TriggerExplosionSparks(oldx, oldy, oldz, 3, -2, 0, item->room_number);
 
 		for (int i = 0; i < 2; i++)
-			TriggerExplosionSparks(oldPos.x, oldPos.y, oldPos.z, 3, -1, 0, item->room_number);
+			TriggerExplosionSparks(oldx, oldy, oldz, 3, -1, 0, item->room_number);
 	}
 
 	AlertNearbyGuards(item);
