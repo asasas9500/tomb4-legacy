@@ -1979,7 +1979,12 @@ void DEL_picked_up_object(short objnum)
 
 		if (!(lara.grenade_type_carried & 1))
 			lara.grenade_type_carried = 9;
-												//LOOK!!!
+
+		if (lara.num_grenade_ammo1 != -1)
+			lara.num_grenade_ammo1 += 10;
+
+		break;
+
 	case GRENADE_GUN_AMMO1_ITEM:
 
 		if (lara.num_grenade_ammo1 != -1)
