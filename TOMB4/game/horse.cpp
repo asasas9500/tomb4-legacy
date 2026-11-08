@@ -133,8 +133,8 @@ void HorsemanControl(short item_number)
 			}
 			else
 			{
-				z = horseman->enemy->pos.z_pos - item->pos.z_pos;
-				x = horseman->enemy->pos.x_pos - item->pos.x_pos;
+				z = lara_item->pos.z_pos - item->pos.z_pos;
+				x = lara_item->pos.x_pos - item->pos.x_pos;
 				larainfo.angle = short(phd_atan(z, x) - item->pos.y_rot);
 				larainfo.distance = SQUARE(x) + SQUARE(z);
 			}
@@ -145,38 +145,35 @@ void HorsemanControl(short item_number)
 
 				if (larainfo.angle < 12288 && larainfo.angle > -12288 && larainfo.distance < 0x400000)
 				{
-					if (item->current_anim_state == 15 || larainfo.angle > 0 || !item->item_flags[1])
+					if (item->current_anim_state != 15 && (larainfo.angle > 0 || !item->item_flags[1] && !(item->mesh_bits & 0x400)))
 					{
-						if (item->current_anim_state != 15 && (larainfo.angle > 0 || item->mesh_bits & 0x400))
+						if (lara.gun_type == WEAPON_SHOTGUN)
 						{
-							if (lara.gun_type == WEAPON_SHOTGUN)
-							{
-								item->hit_points -= 10;
-								item->hit_status = 1;
-							}
-							else if (lara.gun_type == WEAPON_REVOLVER)
-							{
-								item->hit_points -= 20;
-								item->hit_status = 1;
-							}
-							else
-								item->hit_points--;
-
-							SoundEffect(SFX_HORSEMAN_TAKEHIT, &item->pos, SFX_DEFAULT);
-							SoundEffect(SFX_HORSE_RICOCHETS, &item->pos, SFX_DEFAULT);
-							v.x = 0;
-							v.y = -128;
-							v.z = 80;
-							GetJointAbsPosition(item, &v, 1);
-							TriggerHorsemanRicochets(&v, item->pos.y_rot, 7);
+							item->hit_points -= 10;
+							item->hit_status = 1;
 						}
-						else if (!(GetRandomControl() & 7))
+						else if (lara.gun_type == WEAPON_REVOLVER)
 						{
-							if (item->current_anim_state == 15)
-								item->goal_anim_state = 9;
-
-							ExplodeItemNode(item, 10, 1, -24);
+							item->hit_points -= 20;
+							item->hit_status = 1;
 						}
+						else
+							item->hit_points--;
+
+						SoundEffect(SFX_HORSEMAN_TAKEHIT, &item->pos, SFX_DEFAULT);
+						SoundEffect(SFX_HORSE_RICOCHETS, &item->pos, SFX_DEFAULT);
+						v.x = 0;
+						v.y = -128;
+						v.z = 80;
+						GetJointAbsPosition(item, &v, 1);
+						TriggerHorsemanRicochets(&v, item->pos.y_rot, 7);
+					}
+					else if ((item->current_anim_state == 15 || !item->item_flags[1]) && !(GetRandomControl() & 7))
+					{
+						if (item->current_anim_state == 15)
+							item->goal_anim_state = 9;
+
+						ExplodeItemNode(item, 10, 1, -24);
 					}
 
 					if (!item->item_flags[1] && item->mesh_bits & 0x400)
@@ -184,6 +181,7 @@ void HorsemanControl(short item_number)
 				}
 			}
 
+			horseman->hurt_by_lara = 0;
 			GetCreatureMood(item, &info, 1);
 			CreatureMood(item, &info, 1);
 			angle = CreatureTurn(item, horseman->maximum_turn);
@@ -223,14 +221,14 @@ void HorsemanControl(short item_number)
 					}
 				}
 
-				if (info.bite)
+				if (info.distance < 0x100000 && info.bite && info.angle < 1820 && info.angle > -1820)
 				{
-					if (info.distance < 0x100000 && info.angle < 1820 && info.angle > -1820)
-					{
-						item->goal_anim_state = 3;
-						item2->goal_anim_state = 1;
-					}
-					else if (info.angle < -1820 && (info.distance < 0x100000 || info.distance < 0x1C6E39 && info.angle > -3640))
+					item->goal_anim_state = 3;
+					item2->goal_anim_state = 1;
+				}
+				else if (info.bite)
+				{
+					if (info.angle < -1820 && (info.distance < 0x100000 || info.distance < 0x1C6E39 && info.angle > -3640))
 					{
 						horseman->maximum_turn = 0;
 						item->goal_anim_state = 7;
@@ -416,6 +414,17 @@ void HorsemanControl(short item_number)
 					item->pos.y_rot -= 546;
 				else
 					item->pos.y_rot += 546;
+
+				if (!horseman->flags && item->touch_bits & 0x60)
+				{
+					lara_item->hit_points -= 250;
+					lara_item->hit_status = 1;
+					CreatureEffectT(item, &horseman_axe, 10, item->pos.y_rot, DoBloodSplat);
+					horseman->flags = 1;
+				}
+
+				if (item->hit_status)
+					item->goal_anim_state = 9;
 
 				break;
 

@@ -349,7 +349,7 @@ void GameStixControl(short item_number)
 							GetFloor(piece->pos.x_pos, piece->pos.y_pos - 32, piece->pos.z_pos, &room_number);
 
 							if (piece->room_number != room_number)
-								ItemNewRoom(senet_item[piece_moving], room_number);
+								ItemNewRoom(senet_item[i], room_number);
 
 							if (num == 1)
 								ShockwaveExplosion(piece, 0xFF8020, -64);
